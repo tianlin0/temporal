@@ -1,0 +1,96 @@
+variables:
+
+root:
+  activity:
+    id: add-paas
+    template: add-paas
+    arguments:
+      paas_language: ""
+  control:
+    onexit: "return|exit"
+  parallel:
+    - activity:
+        id: add-ci
+        template: add-ci
+        arguments:
+          name: "15kmdrm000qc"
+          startCommand: "/data/app/gw_tnm2_agent/cgi-bin/api/lottery/v2.0/lottery_abroad_gather_agent.sh start && /data/app/ieod-web/php7/bin/php /data/code/public/index.php start"
+          packageCommand: ""
+          compileCommand: "cp -rp ./. ${PUBLISHPATH}/"
+          preBuildCommand: "make prod"
+          runningImage: "odp-global.tencentcloudcr.com/ams-gdp-runtime/php7.4.24-swoole4.7.1-tnm2-polaris-tlinux2.6:v0.11"
+          compileImage: "odp-global.tencentcloudcr.com/compile/tlinux:2.2-minimal-base"
+          paasName: "{{add-paas.responses.paas_name}}"
+      sequence:
+        - activity:
+            id: add-ci-task
+            template: add-ci-task
+            arguments:
+              projectName: "{{variables.projectName}}"
+              paasName: "{{add-paas.responses.paas_name}}"
+              ciId: "{{add-ci.responses.id}}"
+              commitId: ""
+              branch: master
+              imageTag: v1
+              remarks: ""
+              gitUrl: "{{add-paas.responses.git_url}}"
+          parallel:
+            - activity:
+                id: add-cd-dev
+                template: add-cd
+                arguments:
+                  projectName: "{{variables.projectName}}"
+                  paasName: "{{add-paas.responses.paas_name}}"
+                  type: deployment
+                  env: dev
+                  cnName: "{{add-paas.responses.paas_name}}-dev"
+              sequence:
+                - activity:
+                    id: add-cd-task
+                    template: add-cd-task
+                    arguments:
+                      paasName: "{{add-paas.responses.paas_name}}"
+                      cdId: "{{add-cd.responses.cdId}}"
+                      cpuRequest: 0.1
+                      cpuLimit: 0.1
+                      memoryRequest: 256
+                      memoryLimit: 256
+                      replicas: 1
+                      remarks: "golang自动生成"
+            - activity:
+                id: add-cd-dev1
+                template: add-cd
+                arguments:
+                  projectName: "{{variables.projectName}}"
+                  paasName: "{{add-paas.responses.paas_name}}"
+                  type: deployment
+                  env: dev
+                  cnName: "{{add-paas.responses.paas_name}}-dev1"
+            - activity:
+                id: add-cd-pre
+                template: add-cd
+                arguments:
+                  projectName: "{{variables.projectName}}"
+                  paasName: "{{add-paas.responses.paas_name}}"
+                  type: deployment
+                  env: pre
+                  cnName: "{{add-paas.responses.paas_name}}-pre"
+            - activity:
+                id: add-cd-release
+                template: add-cd
+                arguments:
+                  projectName: "{{variables.projectName}}"
+                  paasName: "{{add-paas.responses.paas_name}}"
+                  type: deployment
+                  env: release
+                  cnName: "{{add-paas.responses.paas_name}}-release"
+            - activity:
+                id: add-gateway
+                template: add-gateway
+                arguments:
+                  projectName: "{{variables.projectName}}"
+                  paasName: "{{add-paas.responses.paas_name}}"
+
+responses:
+  paas_name: "{{add-paas.responses.paas_name}}"
+  paasName: "{{add-paas.responses.paas_name}}"

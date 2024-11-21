@@ -1,0 +1,105 @@
+variables:
+
+root:
+  activity:
+    id: add-paas
+    template: add-paas
+    arguments:
+      paas_language: go
+      demo_git_url: https://git.woa.com/vasd/golang-sig/petrelgo.git
+  control:
+    onexit: "return|exit"
+  parallel:
+    - activity:
+        id: add-ci
+        template: add-ci
+        arguments:
+          name: "编译构建"
+          startCommand: "chmod 755 /data/code/petrelgo.sh\n/data/code/petrelgo.sh start"
+          packageCommand: "cp -r petrelgo.sh petrelgo trpc_go.yaml cfg ${PUBLISHPATH}"
+          compileCommand: "go env -w GOPROXY=\"https://goproxy.woa.com,direct\"\nexport GOSUMDB=off && go mod tidy && go build && strip petrelgo"
+          preBuildCommand: ""
+          runningImage: "odp-global.tencentcloudcr.com/runtime/tlinux:2.2-base"
+          compileImage: "odp-global.tencentcloudcr.com/compile/golang:1.18.4"
+          paasName: "{{add-paas.responses.paas_name}}"
+          git: "{{add-paas.responses.git_url}}"
+          version: 2
+      sequence:
+        - activity:
+            id: add-ci-task
+            template: add-ci-task
+            arguments:
+              projectName: "{{variables.projectName}}"
+              paasName: "{{add-paas.responses.paas_name}}"
+              ciId: "{{add-ci.responses.id}}"
+              commitId: ""
+              branch: master
+              imageTag: v1
+              remarks: ""
+              gitUrl: "{{add-paas.responses.git_url}}"
+          parallel:
+            - activity:
+                id: add-cd-dev
+                template: add-cd
+                arguments:
+                  projectName: "{{variables.projectName}}"
+                  paasName: "{{add-paas.responses.paas_name}}"
+                  relateType: odp-devops
+                  type: deploymentPlus
+                  currentVersion: 1
+                  workloadType: deployment
+                  env: dev
+                  cnName: "{{add-paas.responses.paas_name}}-dev"
+              sequence:
+                - activity:
+                    id: add-cd-task
+                    template: add-cd-task
+                    arguments:
+                      paasName: "{{add-paas.responses.paas_name}}"
+                      cdId: "{{add-cd.responses.cdId}}"
+                      cpuRequest: 0.1
+                      cpuLimit: 0.1
+                      memoryRequest: 256
+                      memoryLimit: 256
+                      replicas: 1
+                      remarks: "golang自动生成"
+            - activity:
+                id: add-cd-dev1
+                template: add-cd
+                arguments:
+                  projectName: "{{variables.projectName}}"
+                  paasName: "{{add-paas.responses.paas_name}}"
+                  relateType: odp-devops
+                  type: deploymentPlus
+                  currentVersion: 1
+                  workloadType: deployment
+                  env: dev
+                  cnName: "{{add-paas.responses.paas_name}}-dev1"
+            - activity:
+                id: add-cd-pre
+                template: add-cd
+                arguments:
+                  relateType: odp-devops
+                  projectName: "{{variables.projectName}}"
+                  paasName: "{{add-paas.responses.paas_name}}"
+                  type: deploymentPlus
+                  currentVersion: 1
+                  workloadType: deployment
+                  env: pre
+                  cnName: "{{add-paas.responses.paas_name}}-pre"
+            - activity:
+                id: add-cd-release
+                template: add-cd
+                arguments:
+                  relateType: odp-devops
+                  projectName: "{{variables.projectName}}"
+                  paasName: "{{add-paas.responses.paas_name}}"
+                  type: deploymentPlus
+                  currentVersion: 1
+                  workloadType: deployment
+                  env: release
+                  cnName: "{{add-paas.responses.paas_name}}-release"
+
+responses:
+  paas_name: "{{add-paas.responses.paas_name}}"
+  paasName: "{{add-paas.responses.paas_name}}"

@@ -1,0 +1,36 @@
+variables:
+  projectName: ""
+  paasName: ""
+  cdId: ""
+
+root:
+  activity:
+    id: del-cd-check
+    template: del-cd-check
+  control:
+    onexit: "return|exit"
+  sequence:
+    - activity:
+        id: del-cd-recycling
+        template: del-cd-recycling
+    - activity:
+        id: del-cd-auto-trigger
+        template: del-cd-auto-trigger
+    - activity:
+        id: del-cd-log
+        template: del-cd-log
+    - activity:
+        id: del-cd-grayscale
+        template: del-cd-grayscale
+    - activity:
+        id: del-cd-alarm
+        template: del-cd-alarm
+    - activity:
+        id: del-cd-incluster-service
+        template: del-cd-incluster-service
+    - activity:
+        id: del-cd-bind-tag
+        template: del-cd-bind-tag
+    - activity:
+        id: del-cd
+        template: del-cd

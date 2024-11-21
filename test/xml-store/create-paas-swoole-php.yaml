@@ -1,0 +1,36 @@
+variables:
+
+root:
+  activity:
+    id: add-paas
+    template: add-paas
+    arguments:
+      paas_language: php
+      paas_framecode: actswooleguangzi
+  control:
+    onexit: "return|exit"
+  parallel:
+    - activity:
+        id: add-ci
+        template: add-ci
+        arguments:
+          name: dev
+          startCommand: "chmod +x /data/code/bin/*.sh && /data/code/bin/start.sh --with-l5agent"
+          packageCommand: "cp -rp ./. ${PUBLISHPATH}/"
+          compileCommand: "composer-install.sh"
+          preBuildCommand: "mkdir /data/log/ && chmod -R 777 /data/log/ && mkdir -p /data/website/appsweb && ln -s /data/website/appsweb /usr/local/appsweb && mkdir -p /data/website/commweb && ln -s /data/website/commweb /usr/local/commweb"
+          runningImage: "odp-global.tencentcloudcr.com/yxzj-activity-gdp-runtime/ieg-ams-php:7.4.20-4.5.11-l5agent"
+          compileImage: "odp-global.tencentcloudcr.com/yxzj-activity-gdp-compile/compile-php-qci:1.2.2"
+          environment:
+            env: dev
+          paasName: "{{add-paas.responses.paas_name}}"
+    - activity:
+        id: add-cd
+        template: add-cd
+        arguments:
+          paasName: "{{add-paas.responses.paas_name}}"
+          type: deployment
+          cnName: "{{add-paas.responses.paas_name}}-{{variables.env}}"
+responses:
+  paas_name: "{{add-paas.responses.paas_name}}"
+  paasName: "{{add-paas.responses.paas_name}}"

@@ -1,0 +1,30 @@
+variables:
+  act1:
+    paasId: "mmmmm"
+  act2:
+    paasName: "bbbbb"
+  paasName: paasName_11111
+  projectName: projectName_22222
+
+root:
+  sequence:
+    - activity:
+        id: act1
+        template: Activity1
+        arguments:
+          projectName: "{{variables.projectName}}"
+      control:
+        onexit: "return"
+      parallel:
+        - activity:
+            id: act2
+            template: Activity2
+            arguments:
+              projectName: "{{variables.projectName}}"
+        - activity:
+            id: act3
+            template: Activity3
+            arguments:
+              paasName: "{{act1.arguments.projectName}}"
+          control:
+            wait: act222

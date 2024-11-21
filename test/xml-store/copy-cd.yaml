@@ -1,0 +1,33 @@
+variables:
+  srcProjectName: ""
+  srcPaasName: ""
+  srcCdId: ""
+  projectName: ""
+  paasName: ""
+
+root:
+  activity:
+    id: copy-cd
+    template: copy-cd
+  control:
+    onexit: "return|exit"
+  sequence:
+    - activity:
+        id: copy-cd-log
+        template: copy-cd-log
+        arguments:
+          cdId: "{{copy-cd.responses.id}}"
+    - activity:
+        id: copy-cd-alarm
+        template: copy-cd-alarm
+        arguments:
+          cdId: "{{copy-cd.responses.id}}"
+    - activity:
+        id: copy-cd-incluster
+        template: copy-cd-incluster
+        arguments:
+          cdId: "{{copy-cd.responses.id}}"
+
+responses:
+  cdId: "{{copy-cd.responses.id}}"
+  cd_id: "{{copy-cd.responses.id}}"
