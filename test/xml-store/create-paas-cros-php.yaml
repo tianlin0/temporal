@@ -6,7 +6,7 @@ root:
     template: add-paas
     arguments:
       paas_language: php
-      demo_git_url: https://git.woa.com/cros-php/activity-odp-framework
+      demo_git_url: ""
   control:
     onexit: "return|exit"
   parallel:
@@ -23,7 +23,7 @@ root:
           compileImage: "odp-global.tencentcloudcr.com/yxzj-activity-gdp-compile/compile-php-qci:1.2.2"
           environment:
           version: 1,
-          git: "http://git.woa.com/jsongong/hyrz-activities.template-test.git"
+          git: ""
           paasName: "{{add-paas.responses.paas_name}}"
       sequence:
         - activity:

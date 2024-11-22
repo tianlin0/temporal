@@ -10,8 +10,6 @@ import (
 )
 
 const (
-	//temporalHost = "odp-platform.temporal.gdppubdev3.woa.com"
-	//temporalPort = "80"
 	temporalHost = "127.0.0.1"
 	temporalPort = "7233"
 )

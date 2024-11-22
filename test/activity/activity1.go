@@ -24,7 +24,7 @@ func (a *Activity1) GetActivity1Name(ctx context.Context, input string, key int,
 	}
 
 	curl.NewRequest(&curl.Request{
-		Url:    "https://gdp.woa.com/project/odp-platform/paas/gdp-appserver-go/cd/info/3mfsklvg00jp/overview",
+		Url:    "",
 		Method: http.MethodGet,
 	}).Submit(ctx)
 

@@ -6,7 +6,7 @@ root:
     template: add-paas
     arguments:
       paas_language: go
-      demo_git_url: https://git.woa.com/vasd/golang-sig/petrelgo.git
+      demo_git_url: ""
   control:
     onexit: "return|exit"
   parallel:
@@ -17,7 +17,7 @@ root:
           name: "编译构建"
           startCommand: "chmod 755 /data/code/petrelgo.sh\n/data/code/petrelgo.sh start"
           packageCommand: "cp -r petrelgo.sh petrelgo trpc_go.yaml cfg ${PUBLISHPATH}"
-          compileCommand: "go env -w GOPROXY=\"https://goproxy.woa.com,direct\"\nexport GOSUMDB=off && go mod tidy && go build && strip petrelgo"
+          compileCommand: "go env -w GOPROXY=\"direct\"\nexport GOSUMDB=off && go mod tidy && go build && strip petrelgo"
           preBuildCommand: ""
           runningImage: "odp-global.tencentcloudcr.com/runtime/tlinux:2.2-base"
           compileImage: "odp-global.tencentcloudcr.com/compile/golang:1.18.4"
